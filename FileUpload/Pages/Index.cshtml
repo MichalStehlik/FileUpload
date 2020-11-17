@@ -1,0 +1,14 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<h1>List of files</h1>
+
+<ul class="list-group">
+    @foreach (var fp in Model.FileNames)
+    {
+        <li class="list-group-item">@fp <a asp-page-handler="download" asp-route-filename="@fp">Download</a></li>
+    }
+</ul>

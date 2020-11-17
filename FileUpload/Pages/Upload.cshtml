@@ -1,0 +1,21 @@
+﻿@page
+@model FileUpload.Pages.UploadModel
+@{
+}
+
+<h1>Nahrání nového souboru</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label asp-for="Upload" class="control-label">Soubor</label>
+                <input type="file" asp-for="Upload" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Uložit" class="btn btn-primary" />
+                <a class="btn btn-secondary" asp-page="/Index">Zpět</a>
+            </div>
+</form>
+    </div>
+</div>
