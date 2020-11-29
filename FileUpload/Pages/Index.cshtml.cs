@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using FileUpload.Data;
+using FileUpload.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -16,26 +19,24 @@ namespace FileUpload.Pages
     {
         private IWebHostEnvironment _environment;
         private readonly ILogger<IndexModel> _logger;
+        private ApplicationDbContext _context;
 
         [TempData]
         public string SuccessMessage { get; set; }
         [TempData]
         public string ErrorMessage { get; set; }
-        public List<string> FileNames { get; set; } = new List<string>();
+        public ICollection<StoredFile> Files { get; set; }
 
-        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment)
+        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment, ApplicationDbContext context)
         {
             _logger = logger;
             _environment = environment;
+            _context = context;
         }
 
         public void OnGet()
         {
-            var fullNames = Directory.GetFiles(Path.Combine(_environment.ContentRootPath, "Uploads")).ToList();
-            foreach(var fn in fullNames)
-            {
-                FileNames.Add(Path.GetFileName(fn));
-            }
+            Files = _context.Files.Include(f => f.Uploader).ToList();
         }
 
         public IActionResult OnGetDownload(string filename)
@@ -43,11 +44,18 @@ namespace FileUpload.Pages
             var fullName = Path.Combine(_environment.ContentRootPath, "Uploads", filename);
             if (System.IO.File.Exists(fullName))
             {
-                return PhysicalFile(fullName, MediaTypeNames.Application.Octet, filename);
-                //return File("Uploads/" + filename, MediaTypeNames.Application.Octet); // virtual path
+                var fileRecord = _context.Files.Find(Guid.Parse(filename));
+                if (fileRecord != null)
+                {
+                    return PhysicalFile(fullName, fileRecord.ContentType, fileRecord.OriginalName);
+                }
+                else
+                {
+                    ErrorMessage = "There is no record for such file.";
+                    return RedirectToPage();
+                }
             }
             else
-            //return NotFound();
             {
                 ErrorMessage = "There is no such file.";
                 return RedirectToPage();

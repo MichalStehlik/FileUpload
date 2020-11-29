@@ -4,11 +4,35 @@
     ViewData["Title"] = "Home page";
 }
 
-<h1>List of files</h1>
+<h1>List of common files</h1>
 
-<ul class="list-group">
-    @foreach (var fp in Model.FileNames)
-    {
-        <li class="list-group-item">@fp <a asp-page-handler="download" asp-route-filename="@fp">Download</a></li>
-    }
-</ul>
+@if (Model.Files.Count > 0)
+{
+    <table class="table table-striped table-responsive">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Uploader</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var f in Model.Files)
+        {
+            <tr>
+                <td>@f.OriginalName</td>
+                <td>@f.ContentType</td>
+                <td>@f.Uploader.UserName</td>
+                <td>@f.Uploaded</td>
+                <td><a class="btn btn-sm btn-primary" asp-page-handler="download" asp-route-filename="@f.Id">Download</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>There are no files uploaded yet.</p>
+}
