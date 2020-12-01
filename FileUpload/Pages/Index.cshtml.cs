@@ -61,5 +61,22 @@ namespace FileUpload.Pages
                 return RedirectToPage();
             }
         }
+
+        public IActionResult OnGetThumbnail(string filename)
+        {
+            StoredFile file = _context.Files.Find(Guid.Parse(filename));
+            if (file != null)
+            {
+                if (file.Thumbnail != null)
+                {
+                    return File(file.Thumbnail,file.ContentType);
+                }
+                else
+                {
+                    return NotFound("no thumbnail for this file");
+                }
+            }
+            return NotFound("no record for this file");
+        }
     }
 }

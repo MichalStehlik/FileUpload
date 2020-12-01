@@ -22,5 +22,6 @@ namespace FileUpload.Models
         public string OriginalName { get; set; }
         [Required]
         public string ContentType { get; set; }
+        public byte[] Thumbnail { get; set; }
     }
 }

@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Processing;
 
 namespace FileUpload.Pages
 {
@@ -19,6 +23,8 @@ namespace FileUpload.Pages
     {
         private IWebHostEnvironment _environment;
         private ApplicationDbContext _context;
+        private IConfiguration _configuration;
+        private int _size = 200;
 
         [TempData]
         public string SuccessMessage { get; set; }
@@ -27,10 +33,12 @@ namespace FileUpload.Pages
 
         public IFormFile Upload { get; set; }
 
-        public UploadModel(IWebHostEnvironment environment, ApplicationDbContext context)
+        public UploadModel(IWebHostEnvironment environment, ApplicationDbContext context, IConfiguration configuration)
         {
             _environment = environment;
             _context = context;
+            _configuration = configuration;
+            Int32.TryParse(_configuration["Thumbnail:Size"], out int _size);
         }
 
         public void OnGet()
@@ -47,6 +55,29 @@ namespace FileUpload.Pages
                 ContentType = Upload.ContentType
             };
             string extension = System.IO.Path.GetExtension(Upload.FileName);
+            if (Upload.ContentType.StartsWith("image"))
+            {
+                MemoryStream ims = new MemoryStream();
+                MemoryStream oms = new MemoryStream();
+                Upload.CopyTo(ims);
+                IImageFormat format;
+                using (Image image = Image.Load(ims.ToArray(), out format))
+                {
+                    int largestSize = Math.Max(image.Height, image.Width);
+                    if (image.Width > image.Height)
+                    {
+                        image.Mutate(x => x.Resize(0, _size));
+                    }
+                    else
+                    {
+                        image.Mutate(x => x.Resize(_size, 0));
+                    }
+                    image.Mutate(x => x.Crop(new Rectangle((image.Width - _size) / 2, (image.Height - _size) / 2, _size, _size)));
+                    image.Save(oms, format);
+                }
+                fileRecord.Thumbnail = oms.ToArray();
+            }
+
             try
             {
                 _context.Files.Add(fileRecord);
