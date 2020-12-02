@@ -25,13 +25,15 @@
             <tr>
                 @if (f.Thumbnail != null)
                 {
-                    //var encodedImage = String.Format("data:image/jpg;base64, {0}", Convert.ToBase64String(f.Thumbnail));
-                    <td><img src="@Url.Page("/Index","Thumbnail",new {filename=f.Id })" /></td>  
+                    //var encodedImage = String.Format("data:image/jpg;base64, {0}", Convert.ToBase64String(f.Thumbnail)); // Suitable for very small images only
+                    //<td><img src="@encodedImage" style="height: 64px" /></td>
+                    <td><img src="@Url.Page("/Index","Thumbnail",new {filename=f.Id })" /></td>
+
                 }
                 else
                 {
                     <td></td>
-                }                
+                }
                 <td>@f.OriginalName</td>
                 <td>@f.ContentType</td>
                 <td>@f.Uploader.UserName</td>

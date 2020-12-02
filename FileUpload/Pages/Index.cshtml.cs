@@ -36,7 +36,7 @@ namespace FileUpload.Pages
 
         public void OnGet()
         {
-            Files = _context.Files.Include(f => f.Uploader).ToList();
+            Files = _context.Files.Include(f => f.Uploader).ToList(); // TODO not retrieve thumbnail
         }
 
         public IActionResult OnGetDownload(string filename)
@@ -62,19 +62,19 @@ namespace FileUpload.Pages
             }
         }
 
-        public IActionResult OnGetThumbnail(string filename)
+        public async Task<IActionResult> OnGetThumbnail(string filename)
         {
-            StoredFile file = _context.Files.Find(Guid.Parse(filename));
+            StoredFileContent file = await _context.Files
+                .Where(f => f.Id == Guid.Parse(filename))
+                .Select(f => new StoredFileContent{ Content = f.Thumbnail, ContentType = f.ContentType })
+                .SingleOrDefaultAsync();
             if (file != null)
             {
-                if (file.Thumbnail != null)
+                if (file.Content != null)
                 {
-                    return File(file.Thumbnail,file.ContentType);
+                    return File(file.Content, file.ContentType);
                 }
-                else
-                {
-                    return NotFound("no thumbnail for this file");
-                }
+                return NotFound("no thumbnail for this file");
             }
             return NotFound("no record for this file");
         }
