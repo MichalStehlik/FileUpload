@@ -48,7 +48,10 @@ namespace FileUpload.Pages
         public async Task<IActionResult> OnPostAsync()
         {
             var userId = User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
+            Guid newId = Guid.NewGuid();
+
             var fileRecord = new StoredFile {
+                Id = newId,
                 OriginalName = Upload.FileName,
                 UploaderId = userId,
                 Uploaded = DateTime.Now,
@@ -75,7 +78,12 @@ namespace FileUpload.Pages
                     image.Mutate(x => x.Crop(new Rectangle((image.Width - _size) / 2, (image.Height - _size) / 2, _size, _size)));
                     image.Save(oms, format);
                 }
-                fileRecord.Thumbnail = oms.ToArray();
+
+                fileRecord.Thumbnail = new ThumbnailBlob()
+                {
+                    Id = newId,
+                    Blob = oms.ToArray()
+                };
             }
 
             try

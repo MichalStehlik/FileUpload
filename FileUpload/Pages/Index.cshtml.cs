@@ -36,7 +36,7 @@ namespace FileUpload.Pages
 
         public void OnGet()
         {
-            Files = _context.Files.Include(f => f.Uploader).ToList();
+            Files = _context.Files.AsNoTracking().Include(f => f.Uploader).ToList();
         }
 
         public IActionResult OnGetDownload(string filename)
@@ -62,14 +62,14 @@ namespace FileUpload.Pages
             }
         }
 
-        public IActionResult OnGetThumbnail(string filename)
+        public async Task<IActionResult> OnGetThumbnail(string filename)
         {
-            StoredFile file = _context.Files.Find(Guid.Parse(filename));
+            StoredFile file = await _context.Files.AsNoTracking().Where(f => f.Id == Guid.Parse(filename)).Include(f => f.Thumbnail).SingleOrDefaultAsync();
             if (file != null)
             {
                 if (file.Thumbnail != null)
                 {
-                    return File(file.Thumbnail,file.ContentType);
+                    return File(file.Thumbnail.Blob,file.ContentType);
                 }
                 else
                 {
