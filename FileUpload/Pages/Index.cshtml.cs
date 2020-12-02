@@ -71,7 +71,7 @@ namespace FileUpload.Pages
               .SingleOrDefaultAsync();
             if (file != null)
             {
-                if (file.Content != null)
+                if (file.Thumbnail != null)
                 {
                     return File(file.Thumbnail.Blob,file.ContentType);
                 }

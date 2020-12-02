@@ -38,7 +38,7 @@ namespace FileUpload.Pages
             _environment = environment;
             _context = context;
             _configuration = configuration;
-            Int32.TryParse(_configuration["Thumbnail:Size"], out int _size);
+            Int32.TryParse(_configuration["Thumbnail:Size"], out _size);
         }
 
         public void OnGet()
