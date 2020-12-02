@@ -25,8 +25,8 @@
             <tr>
                 @if (f.Thumbnail != null)
                 {
-                    var encodedImage = String.Format("data:image/jpg;base64, {0}", Convert.ToBase64String(f.Thumbnail));
-                    <td><img src="@encodedImage" style="height: 64px" /></td>
+                    //var encodedImage = String.Format("data:image/jpg;base64, {0}", Convert.ToBase64String(f.Thumbnail));
+                    <td><img src="@Url.Page("/Index","Thumbnail",new {filename=f.Id })" /></td>  
                 }
                 else
                 {
