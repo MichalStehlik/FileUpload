@@ -64,17 +64,18 @@ namespace FileUpload.Pages
 
         public async Task<IActionResult> OnGetThumbnail(string filename)
         {
-            StoredFile file = await _context.Files.AsNoTracking().Where(f => f.Id == Guid.Parse(filename)).Include(f => f.Thumbnail).SingleOrDefaultAsync();
+            StoredFile file = await _context.Files
+              .AsNoTracking()
+              .Where(f => f.Id == Guid.Parse(filename))
+              .Include(f => f.Thumbnail)
+              .SingleOrDefaultAsync();
             if (file != null)
             {
-                if (file.Thumbnail != null)
+                if (file.Content != null)
                 {
                     return File(file.Thumbnail.Blob,file.ContentType);
                 }
-                else
-                {
-                    return NotFound("no thumbnail for this file");
-                }
+                return NotFound("no thumbnail for this file");
             }
             return NotFound("no record for this file");
         }
