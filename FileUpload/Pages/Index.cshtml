@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -23,12 +23,11 @@
         @foreach (var f in Model.Files)
         {
             <tr>
-                @if (f.Thumbnail != null)
+                @if (f.ThumbnailId != null)
                 {
                     //var encodedImage = String.Format("data:image/jpg;base64, {0}", Convert.ToBase64String(f.Thumbnail)); // Suitable for very small images only
                     //<td><img src="@encodedImage" style="height: 64px" /></td>
-                    <td><img src="@Url.Page("/Index","Thumbnail",new {filename=f.Id })" /></td>
-
+                    <td><img src="@Url.Page("/Index","Thumbnail",new {filename=f.ThumbnailId })" /></td>
                 }
                 else
                 {
@@ -40,9 +39,9 @@
                 <td>@f.Uploaded</td>
                 <td>
                     <a class="btn btn-sm btn-primary" asp-page-handler="download" asp-route-filename="@f.Id">Download</a>
-                    @if (f.Thumbnail != null)
+                    @if (f.ThumbnailId != null)
                     {
-                        <a class="btn btn-sm btn-secondary" asp-page-handler="thumbnail" asp-route-filename="@f.Id">Thumbnail</a>
+                        <a class="btn btn-sm btn-secondary" asp-page-handler="thumbnail" asp-route-filename="@f.ThumbnailId">Thumbnail</a>
                     }
                 </td>
             </tr>

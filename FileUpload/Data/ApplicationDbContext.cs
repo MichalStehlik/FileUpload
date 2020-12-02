@@ -11,6 +11,8 @@ namespace FileUpload.Data
     public class ApplicationDbContext : IdentityDbContext
     {
         public DbSet<StoredFile> Files { get; set; }
+        public DbSet<ThumbnailBlob> Thumbnails { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -32,6 +34,11 @@ namespace FileUpload.Data
                 PasswordHash = hasher.HashPassword(null, "Admin_1234"),
                 SecurityStamp = string.Empty
             });
+
+            modelBuilder.Entity<StoredFile>()
+                .HasOne<ThumbnailBlob>(sf => sf.Thumbnail)
+                .WithOne(tb => tb.ThumbnailOf)
+                .HasForeignKey<StoredFile>(sf => sf.ThumbnailId);
         }
     }
 }

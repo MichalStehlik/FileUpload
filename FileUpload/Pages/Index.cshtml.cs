@@ -36,7 +36,7 @@ namespace FileUpload.Pages
 
         public void OnGet()
         {
-            Files = _context.Files.Include(f => f.Uploader).ToList(); // TODO not retrieve thumbnail
+            Files = _context.Files.AsNoTracking().Include(f => f.Uploader).ToList();
         }
 
         public IActionResult OnGetDownload(string filename)
@@ -64,15 +64,16 @@ namespace FileUpload.Pages
 
         public async Task<IActionResult> OnGetThumbnail(string filename)
         {
-            StoredFileContent file = await _context.Files
-                .Where(f => f.Id == Guid.Parse(filename))
-                .Select(f => new StoredFileContent{ Content = f.Thumbnail, ContentType = f.ContentType })
-                .SingleOrDefaultAsync();
+            StoredFile file = await _context.Files
+              .AsNoTracking()
+              .Where(f => f.Id == Guid.Parse(filename))
+              .Include(f => f.Thumbnail)
+              .SingleOrDefaultAsync();
             if (file != null)
             {
                 if (file.Content != null)
                 {
-                    return File(file.Content, file.ContentType);
+                    return File(file.Thumbnail.Blob,file.ContentType);
                 }
                 return NotFound("no thumbnail for this file");
             }

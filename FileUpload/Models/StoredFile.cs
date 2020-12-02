@@ -11,6 +11,7 @@ namespace FileUpload.Models
     public class StoredFile
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public Guid Id { get; set; }
         [ForeignKey("UploaderId")]
         public IdentityUser Uploader { get; set; }
@@ -22,6 +23,7 @@ namespace FileUpload.Models
         public string OriginalName { get; set; }
         [Required]
         public string ContentType { get; set; }
-        public byte[] Thumbnail { get; set; }
+        public ThumbnailBlob Thumbnail { get; set; }
+        public Guid? ThumbnailId { get; set; }
     }
 }
